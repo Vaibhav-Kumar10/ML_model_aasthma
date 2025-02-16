@@ -5,31 +5,23 @@ from tensorflow import keras
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_absolute_error
 from preprocess import preprocess_data
-import numpy as np
-from sklearn.model_selection import KFold
 from tensorflow.keras import regularizers
 
-# Load and prepare dataset
+# Load dataset
 df = pd.read_csv("data/dataset.csv")
 df.columns = df.columns.str.strip()
-
-# Enhanced Feature Engineering
-# df["CO2_SO2_Interaction"] = df["CO2 level"] * df["SO2 level"]
-# df["CO2_Squared"] = df["CO2 level"] ** 2
-# df["SO2_Squared"] = df["SO2 level"] ** 2
-# df["Log_CO2"] = np.log1p(df["CO2 level"])
-# df["Log_SO2"] = np.log1p(df["SO2 level"])
 
 # Split dataset
 train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
 
-# Preprocess data
+# Preprocess data (No Extra Features)
 X_train, y_train, encoder, scaler = preprocess_data(train_df, train=True)
 X_test, y_test, _, _ = preprocess_data(
     test_df, train=False, encoder=encoder, scaler=scaler
 )
 
 
+# Define Model
 def create_model(input_dim):
     inputs = keras.Input(shape=(input_dim,))
 

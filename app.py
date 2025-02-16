@@ -7,14 +7,14 @@ from flask import Flask, request, jsonify
 # Load trained model
 model = tf.keras.models.load_model("model.keras")
 
-# Load preprocessing objects (encoder & scaler)
+# Load preprocessing objects
 with open("preprocessing.pkl", "rb") as f:
     encoder, scaler = pickle.load(f)
 
 # Define Flask app
 app = Flask(__name__)
 
-# Define input features expected by the model
+# Define expected input features
 FEATURES = [
     "AQI",
     "PM2.5",
@@ -42,9 +42,11 @@ def predict():
         # Get JSON data from request
         data = request.json
 
+
         # Ensure all required fields are present
         if not all(feature in data for feature in FEATURES):
             return jsonify({"error": "Missing required fields"}), 400
+
 
         # Convert JSON data to DataFrame
         df = pd.DataFrame([data])
