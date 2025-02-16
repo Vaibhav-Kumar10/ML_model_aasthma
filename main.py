@@ -12,7 +12,9 @@ with open("preprocessing.pkl", "rb") as f:
 user_df = get_user_input()
 
 # Preprocess user input
-X_processed, _, _, _ = preprocess_data(user_df, train=False, encoder=encoder, scaler=scaler)
+X_processed, _, _, _ = preprocess_data(
+    user_df, train=False, encoder=encoder, scaler=scaler
+)
 
 # Make prediction
 prediction = model.predict(X_processed)[0][0]

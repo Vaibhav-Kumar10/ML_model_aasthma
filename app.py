@@ -16,26 +16,36 @@ app = Flask(__name__)
 
 # Define input features expected by the model
 FEATURES = [
-    "AQI", "PM2.5", "SO2 level", "NO2 level", "CO2 level", 
-    "Humidity", "Temperature", "Asthma Symptoms Frequency", 
-    "Triggers", "Weather Sensitivity", "Poor Air Quality Exposure", 
-    "Night Breathing Difficulty"
+    "AQI",
+    "PM2.5",
+    "SO2 level",
+    "NO2 level",
+    "CO2 level",
+    "Humidity",
+    "Temperature",
+    "Asthma Symptoms Frequency",
+    "Triggers",
+    "Weather Sensitivity",
+    "Poor Air Quality Exposure",
+    "Night Breathing Difficulty",
 ]
+
 
 @app.route("/")
 def home():
     return jsonify({"message": "Asthma Risk Prediction API is running!"})
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
         # Get JSON data from request
         data = request.json
-        
+
         # Ensure all required fields are present
         if not all(feature in data for feature in FEATURES):
             return jsonify({"error": "Missing required fields"}), 400
-        
+
         # Convert JSON data to DataFrame
         df = pd.DataFrame([data])
 
@@ -45,10 +55,18 @@ def predict():
         # df["SO2_Squared"] = df["SO2 level"] ** 2
         # df["Log_CO2"] = np.log1p(df["CO2 level"])
         # df["Log_SO2"] = np.log1p(df["SO2 level"])
-        
+
         # Preprocess categorical & numerical data
-        categorical_features = ["Asthma Symptoms Frequency", "Triggers", "Weather Sensitivity", "Poor Air Quality Exposure", "Night Breathing Difficulty"]
-        numerical_features = [col for col in df.columns if col not in categorical_features]
+        categorical_features = [
+            "Asthma Symptoms Frequency",
+            "Triggers",
+            "Weather Sensitivity",
+            "Poor Air Quality Exposure",
+            "Night Breathing Difficulty",
+        ]
+        numerical_features = [
+            col for col in df.columns if col not in categorical_features
+        ]
 
         # Encode categorical features
         df_categorical = encoder.transform(df[categorical_features])
@@ -69,6 +87,7 @@ def predict():
         return jsonify({"error": "Missing required key: " + str(ke)}), 400
     except Exception as e:
         return jsonify({"error": "Internal server error: " + str(e)}), 500
+
 
 # Run the app
 if __name__ == "__main__":
