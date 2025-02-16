@@ -1,32 +1,71 @@
+import pickle
+import tensorflow as tf
+import numpy as np
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from flask import Flask, request, jsonify
 
-def preprocess_data(df, train=False, encoder=None, scaler=None):
-    categorical_cols = ["Asthma Symptoms Frequency", "Triggers", "Weather Sensitivity", 
-                        "Poor Air Quality Exposure", "Night Breathing Difficulty"]
-    numerical_cols = ["AQI", "PM2.5", "SO2 level", "NO2 level", "CO2 level", "Humidity", "Temperature"]
+# Load trained model
+model = tf.keras.models.load_model("model.keras")
 
-    # Extract Features & Target Variable
-    X = df[numerical_cols + categorical_cols]
-    y = df["Risk Factor"] if "Risk Factor" in df else None
+# Load preprocessing objects (encoder & scaler)
+with open("preprocessing.pkl", "rb") as f:
+    encoder, scaler = pickle.load(f)
 
-    # Handle Encoder & Scaler
-    if train:
-        encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)  
-        scaler = StandardScaler()
-        encoded_cats = encoder.fit_transform(X[categorical_cols])
-        scaled_nums = scaler.fit_transform(X[numerical_cols])
-    else:
-        if encoder is None or scaler is None:
-            raise ValueError("Encoder and Scaler must be provided in inference mode")
-        encoded_cats = encoder.transform(X[categorical_cols])
-        scaled_nums = scaler.transform(X[numerical_cols])
+# Define Flask app
+app = Flask(_name_)
 
-    # Convert Encoded & Scaled Data into DataFrames
-    X_processed = pd.DataFrame(scaled_nums, columns=numerical_cols)
-    X_encoded = pd.DataFrame(encoded_cats, columns=encoder.get_feature_names_out(categorical_cols))
+# Define input features expected by the model
+FEATURES = [
+    "AQI", "PM2.5", "SO2 level", "NO2 level", "CO2 level", 
+    "Humidity", "Temperature", "Asthma Symptoms Frequency", 
+    "Triggers", "Weather Sensitivity", "Poor Air Quality Exposure", 
+    "Night Breathing Difficulty"
+]
 
-    # Concatenate Processed Numerical & Categorical Features
-    X_final = pd.concat([X_processed, X_encoded], axis=1)
+@app.route("/")
+def home():
+    return jsonify({"message": "Asthma Risk Prediction API is running!"})
 
-    return X_final, y, encoder, scaler
+@app.route("/predict", methods=["POST"])
+def predict():
+    try:
+        # Get JSON data from request
+        data = request.json
+        
+        # Ensure all required fields are present
+        if not all(feature in data for feature in FEATURES):
+            return jsonify({"error": "Missing required fields"}), 400
+        
+        # Convert JSON data to DataFrame
+        df = pd.DataFrame([data])
+
+        # ✅ Add Missing Feature Used in Training
+        df["AQI_PM_Ratio"] = df["AQI"] / (df["PM2.5"] + 1)  # Prevents division by zero
+
+        # ✅ Remove Extra Features Not Used in Training
+        unwanted_features = ["CO2_Squared", "Log_CO2", "Log_SO2", "SO2_Squared"]
+        df = df.drop(columns=[col for col in unwanted_features if col in df.columns], errors='ignore')
+
+        # Preprocess categorical & numerical data
+        categorical_features = ["Asthma Symptoms Frequency", "Triggers", "Weather Sensitivity", "Poor Air Quality Exposure", "Night Breathing Difficulty"]
+        numerical_features = [col for col in df.columns if col not in categorical_features]
+
+        # Encode categorical features
+        df_categorical = encoder.transform(df[categorical_features])  
+        df_numerical = scaler.transform(df[numerical_features])
+
+        # Combine transformed features
+        X = np.hstack([df_numerical, df_categorical])
+
+        # Make prediction
+        prediction = model.predict(X)[0][0]
+
+        # Return prediction
+        return jsonify({"asthma_risk_score": float(prediction)})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Run the app
+if _name_ == "_main_":
+    app.run(host="0.0.0.0", port=7860, debug=True)
