@@ -14,11 +14,11 @@ df = pd.read_csv("data/dataset.csv")
 df.columns = df.columns.str.strip()
 
 # Enhanced Feature Engineering
-df["CO2_SO2_Interaction"] = df["CO2 level"] * df["SO2 level"]
-df["CO2_Squared"] = df["CO2 level"] ** 2
-df["SO2_Squared"] = df["SO2 level"] ** 2
-df["Log_CO2"] = np.log1p(df["CO2 level"])
-df["Log_SO2"] = np.log1p(df["SO2 level"])
+# df["CO2_SO2_Interaction"] = df["CO2 level"] * df["SO2 level"]
+# df["CO2_Squared"] = df["CO2 level"] ** 2
+# df["SO2_Squared"] = df["SO2 level"] ** 2
+# df["Log_CO2"] = np.log1p(df["CO2 level"])
+# df["Log_SO2"] = np.log1p(df["SO2 level"])
 
 # Split dataset
 train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
