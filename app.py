@@ -7,14 +7,14 @@ from flask import Flask, request, jsonify
 # Load trained model
 model = tf.keras.models.load_model("model.keras")
 
-# Load preprocessing objects (encoder & scaler)
+# Load preprocessing objects
 with open("preprocessing.pkl", "rb") as f:
     encoder, scaler = pickle.load(f)
 
 # Define Flask app
 app = Flask(__name__)
 
-# Define input features expected by the model
+# Define expected input features
 FEATURES = [
     "AQI", "PM2.5", "SO2 level", "NO2 level", "CO2 level", 
     "Humidity", "Temperature", "Asthma Symptoms Frequency", 
@@ -39,7 +39,7 @@ def predict():
         # Convert JSON data to DataFrame
         df = pd.DataFrame([data])
 
-        # Preprocess categorical & numerical data
+        # Separate categorical and numerical features
         categorical_features = ["Asthma Symptoms Frequency", "Triggers", "Weather Sensitivity", "Poor Air Quality Exposure", "Night Breathing Difficulty"]
         numerical_features = [col for col in df.columns if col not in categorical_features]
 
