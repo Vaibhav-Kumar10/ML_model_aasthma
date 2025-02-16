@@ -12,7 +12,7 @@ with open("preprocessing.pkl", "rb") as f:
     encoder, scaler = pickle.load(f)
 
 # Define Flask app
-app = Flask(_name_)
+app = Flask(__name__)
 
 # Define input features expected by the model
 FEATURES = [
@@ -63,9 +63,13 @@ def predict():
         # Return prediction
         return jsonify({"asthma_risk_score": float(prediction)})
 
+    except ValueError as ve:
+        return jsonify({"error": "Invalid input data format: " + str(ve)}), 400
+    except KeyError as ke:
+        return jsonify({"error": "Missing required key: " + str(ke)}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error: " + str(e)}), 500
 
 # Run the app
-if _name_ == "_main_":
-    app.run(host="0.0.0.0", port=7860, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=7860, debug=True)
