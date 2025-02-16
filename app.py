@@ -31,21 +31,14 @@ def predict():
     try:
         # Get JSON data from request
         data = request.json
-        
+
         # Ensure all required fields are present
         if not all(feature in data for feature in FEATURES):
             return jsonify({"error": "Missing required fields"}), 400
-        
+
         # Convert JSON data to DataFrame
         df = pd.DataFrame([data])
 
-        # Apply feature engineering
-        # df["CO2_SO2_Interaction"] = df["CO2 level"] * df["SO2 level"]
-        # df["CO2_Squared"] = df["CO2 level"] ** 2
-        # df["SO2_Squared"] = df["SO2 level"] ** 2
-        # df["Log_CO2"] = np.log1p(df["CO2 level"])
-        # df["Log_SO2"] = np.log1p(df["SO2 level"])
-        
         # Preprocess categorical & numerical data
         categorical_features = ["Asthma Symptoms Frequency", "Triggers", "Weather Sensitivity", "Poor Air Quality Exposure", "Night Breathing Difficulty"]
         numerical_features = [col for col in df.columns if col not in categorical_features]
