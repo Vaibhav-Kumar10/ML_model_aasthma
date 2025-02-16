@@ -12,7 +12,7 @@ with open("preprocessing.pkl", "rb") as f:
     encoder, scaler = pickle.load(f)
 
 # Define Flask app
-app = Flask(__name__)
+app = Flask(_name_)
 
 # Define input features expected by the model
 FEATURES = [
@@ -51,7 +51,7 @@ def predict():
         numerical_features = [col for col in df.columns if col not in categorical_features]
 
         # Encode categorical features
-        df_categorical = encoder.transform(df[categorical_features])
+        df_categorical = encoder.transform(df[categorical_features]).toarray()
         df_numerical = scaler.transform(df[numerical_features])
 
         # Combine transformed features
@@ -67,5 +67,5 @@ def predict():
         return jsonify({"error": str(e)}), 500
 
 # Run the app
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=7860, debug=True)
+if _name_ == "_main_":
+    app.run(host="0.0.0.0", port=7860, debug=True)
