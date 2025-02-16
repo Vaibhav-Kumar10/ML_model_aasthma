@@ -51,7 +51,7 @@ def predict():
         numerical_features = [col for col in df.columns if col not in categorical_features]
 
         # Encode categorical features
-        df_categorical = encoder.transform(df[categorical_features]).toarray()
+        df_categorical = encoder.transform(df[categorical_features])
         df_numerical = scaler.transform(df[numerical_features])
 
         # Combine transformed features
