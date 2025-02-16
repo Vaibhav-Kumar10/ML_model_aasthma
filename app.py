@@ -42,11 +42,9 @@ def predict():
         # Get JSON data from request
         data = request.json
 
-
         # Ensure all required fields are present
         if not all(feature in data for feature in FEATURES):
             return jsonify({"error": "Missing required fields"}), 400
-
 
         # Convert JSON data to DataFrame
         df = pd.DataFrame([data])
@@ -57,6 +55,8 @@ def predict():
         # df["SO2_Squared"] = df["SO2 level"] ** 2
         # df["Log_CO2"] = np.log1p(df["CO2 level"])
         # df["Log_SO2"] = np.log1p(df["SO2 level"])
+        # ✅ Add Missing Feature Used in Training
+        df["AQI_PM_Ratio"] = df["AQI"] / (df["PM2.5"] + 1)  # Prevents division by zero
 
         # Preprocess categorical & numerical data
         categorical_features = [
