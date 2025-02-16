@@ -40,11 +40,11 @@ def predict():
         df = pd.DataFrame([data])
 
         # Apply feature engineering
-        df["CO2_SO2_Interaction"] = df["CO2 level"] * df["SO2 level"]
-        df["CO2_Squared"] = df["CO2 level"] ** 2
-        df["SO2_Squared"] = df["SO2 level"] ** 2
-        df["Log_CO2"] = np.log1p(df["CO2 level"])
-        df["Log_SO2"] = np.log1p(df["SO2 level"])
+        # df["CO2_SO2_Interaction"] = df["CO2 level"] * df["SO2 level"]
+        # df["CO2_Squared"] = df["CO2 level"] ** 2
+        # df["SO2_Squared"] = df["SO2 level"] ** 2
+        # df["Log_CO2"] = np.log1p(df["CO2 level"])
+        # df["Log_SO2"] = np.log1p(df["SO2 level"])
         
         # Preprocess categorical & numerical data
         categorical_features = ["Asthma Symptoms Frequency", "Triggers", "Weather Sensitivity", "Poor Air Quality Exposure", "Night Breathing Difficulty"]
